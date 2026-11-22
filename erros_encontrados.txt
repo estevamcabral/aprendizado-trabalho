@@ -1,0 +1,65 @@
+ERROS ENCONTRADOS NO ARQUIVO Dados_REG.csv
+(linha = linha do arquivo, contando o cabecalho como linha 1)
+
+1. MESMA CATEGORIA ESCRITA DE JEITOS DIFERENTES (coluna GRAM)
+   linha 195, isolado 1633: "POSITIVO"
+   linha 470, isolado 1928: "Positiva"
+   As duas sao a categoria "Positivo" escrita de outro jeito.
+
+2. VALORES QUE NAO SAO NENHUMA DAS TRES CATEGORIAS (coluna GRAM)
+   linha 282, isolado 1723: "Variável"
+   linha 409, isolado 1862: "Levedura? não " (anotacao de duvida, com espaco no final)
+   O GRAM so deveria ter Negativo, Positivo ou Levedura.
+
+3. CODIGO DE ISOLADO REPETIDO (coluna n°)
+   linhas 113 e 114: o codigo 1551 aparece duas vezes.
+   A morfologia e igual nas duas linhas, mas 15 das 23 atividades tem valores
+   diferentes (exemplo: Atividade 16 e Positivo numa linha e Negativo na outra).
+
+4. RESIDUO DE FORMULA DO EXCEL (coluna Atividade 23)
+   linha 277, isolado 1718: "#NÚM!"
+
+5. VALORES FALTANDO
+   Atividade 20 - 27 celulas vazias, isolados:
+     1492, 1511, 1522, 1576, 1627, 1633, 1664, 1668, 1711, 1718, 1723, 1727,
+     1795, 1796, 1797, 1808, 1817, 1833, 1835, 1873, 1878, 1882, 1894, 1895,
+     1909, 1926, 1961
+   Atividade 21 - 17 celulas vazias, isolados:
+     1511, 1576, 1627, 1633, 1676, 1708, 1711, 1720, 1808, 1817, 1835, 1848,
+     1873, 1877, 1878, 1926, 1961
+   Atividade 23 - 3 celulas vazias (isolados 1562, 1611 e 1728) e o "#NÚM!" do isolado 1718
+   Morfologia:
+     linha 248, isolado 1688: "NA" em Borda, Textura, Forma, Brilho, Muco e Relevo
+     linha 319, isolado 1767: "NA" em Forma, Brilho, Muco e Relevo
+     linha 308, isolado 1755: Relevo vazio
+
+6. CODIGOS FORA DO PADRAO DA COLUNA
+   Brilho (o resto da coluna so usa 1 e 2):
+     linha 90,  isolado 1523: Brilho = 4
+     linha 300, isolado 1743: Brilho = 0
+     linha 308, isolado 1755: Brilho = 0
+   Muco (o resto da coluna so usa 0 e 1):
+     linha 391, isolado 1843: Muco = 2
+
+7. CELULAS COM DOIS CODIGOS, EM ORDEM INCONSISTENTE
+   Cores:   70 celulas (exemplo: "2 & 1" em 16 isolados e "1 & 2" em 1 isolado)
+   Forma:   47 celulas ("4 & 1", "4 & 2" e "1 & 2")
+   Brilho:  36 celulas ("1 & 2" em 28 isolados e "2 & 1" em 8)
+   Textura: 23 celulas ("1 & 2" em 16 isolados e "2 & 1" em 7)
+   "1 & 2" e "2 & 1" significam a mesma combinacao escrita em ordens diferentes.
+
+8. COLUNA QUE REPETE OUTRA (coluna Cor)
+   Cor = 1 nos 436 isolados com um codigo em Cores e
+   Cor = 2 nos 70 isolados com dois codigos em Cores.
+   A coluna Cor so repete a informacao da coluna Cores.
+
+9. RESULTADOS ESCRITOS EM TEXTO (Atividades 03, 04 e 16)
+   Essas atividades usam "Positivo" e "Negativo", enquanto a Atividade 01,
+   que tambem e sim/nao, usa 0 e 1.
+
+10. VALORES NEGATIVOS EM ATIVIDADES
+   Atividade 06: 34 valores negativos (menor: -0.06, isolado 1914, linha 457)
+   Atividade 07: 34 valores negativos (menor: -0.08, isolado 1658, linha 219)
+   Atividade 08: 125 valores negativos (menor: -0.19, isolado 1574, linha 137)
+   Atividade 12: 1 valor negativo (-0.08, isolado 1795, linha 345)
+   Resultado de atividade negativo nao existe; indica ausencia de atividade.
