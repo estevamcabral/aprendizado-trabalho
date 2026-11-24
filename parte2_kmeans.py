@@ -2,12 +2,14 @@ import sys
 from pathlib import Path
 
 import matplotlib
+import seaborn as sns
 
 matplotlib.use("Agg")  
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 from sklearn.metrics import (
     adjusted_mutual_info_score,
     adjusted_rand_score,
@@ -173,6 +175,30 @@ def tabela_por_grupo(X, grupos, gram, estab_grupo):
     return tab.round(3)
 
 
+def visualizar_grupos(X, grupos):
+    pca = PCA(n_components=2)
+    dados_2d = pca.fit_transform(X)
+
+    plt.figure(figsize=(9, 6))
+
+    for g in sorted(np.unique(grupos)):
+        mascara = grupos == g
+        plt.scatter(
+            dados_2d[mascara, 0],
+            dados_2d[mascara, 1],
+            label=f"Grupo {g}",
+            alpha=0.7
+        )
+
+    plt.xlabel("Primeira componente principal")
+    plt.ylabel("Segunda componente principal")
+    plt.title("Distribuição dos grupos - K-Means (k=5)")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(SAIDA / "kmeans_pca.png", dpi=150)
+    plt.close()
+
+
 # =============================================================================
 # D. CARACTERIZACAO
 # =============================================================================
@@ -180,6 +206,24 @@ def tabela_por_grupo(X, grupos, gram, estab_grupo):
 def caracterizar(tabela, X, grupos):
     perfil = X.groupby(grupos).mean().T
     perfil.columns = [f"Grupo {g}" for g in perfil.columns]
+
+        # Mapa de calor das atividades por grupo
+    plt.figure(figsize=(10, 9))
+
+    sns.heatmap(
+        perfil,
+        annot=True,
+        cmap="RdBu_r",
+        center=0,
+        fmt=".1f"
+    )
+
+    plt.title("Média das atividades por grupo")
+    plt.xlabel("Grupo")
+    plt.ylabel("Atividade")
+    plt.tight_layout()
+    plt.savefig(SAIDA / "kmeans_heatmap.png", dpi=300)
+    plt.close()
 
     print("\nPerfil médio das atividades (desvios-padrão; atividades 02, 14, 15 "
           "e 23 estão em log):")
@@ -199,8 +243,8 @@ def caracterizar(tabela, X, grupos):
         cols = tabela.filter(regex=f"^{c}_")
         prop = cols.groupby(grupos).mean()
         codigo = prop.idxmax(axis=1).str.replace(c + "_", "", regex=False)
-        pct = (prop.max(axis=1) * 100).round().astype(int).astype(str)
-        moda_grupo[c] = codigo + " (" + pct + "%)"
+        pct = (prop.max(axis=1) * 100).round(0).astype(int)
+        moda_grupo[c] = codigo + " (" + pct.astype(str) + "%)"
 
         geral = cols.mean()
         moda_geral[c] = (f"{geral.idxmax().replace(c + '_', '')} "
@@ -210,6 +254,7 @@ def caracterizar(tabela, X, grupos):
     print("  " + " | ".join(f"{c}: {v}" for c, v in moda_geral.items()))
     print("\nModa da morfologia por grupo:")
     print(pd.DataFrame(moda_grupo).rename_axis("grupo").to_string())
+
 
 
 # =============================================================================
@@ -255,6 +300,7 @@ def main():
             tab.to_csv(SAIDA / "kmeans_tabela_grupos.csv")
 
             caracterizar(tabela, X, grupos)
+            visualizar_grupos(X, grupos)
 
             print("\nConcluído. Arquivos gerados em saida/:")
             print("  kmeans_resultados.txt, kmeans_escolha_k.csv/.png,")

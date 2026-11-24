@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import adjusted_rand_score, davies_bouldin_score, silhouette_score
 
@@ -43,6 +44,27 @@ plt.savefig("saida/hierarquico_escolha_k.png")
 # =============================================================================
 modelo = AgglomerativeClustering(n_clusters=7, linkage="ward")
 grupos = modelo.fit_predict(X) + 1
+
+pca = PCA(n_components=2)
+dados_pca = pca.fit_transform(X)
+
+plt.figure(figsize=(9, 6))
+
+for g in sorted(set(grupos)):
+    plt.scatter(
+        dados_pca[grupos == g, 0],
+        dados_pca[grupos == g, 1],
+        label=f"Grupo {g}",
+        alpha=0.7
+    )
+
+plt.title("Distribuição dos isolados - Agrupamento Hierárquico")
+plt.xlabel(f"Componente Principal 1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
+plt.ylabel(f"Componente Principal 2 ({pca.explained_variance_ratio_[1]*100:.1f}%)")
+plt.legend()
+plt.tight_layout()
+plt.savefig("saida/hierarquico_pca.png", dpi=300)
+plt.close()
 
 pd.Series(grupos, index=X.index, name="grupo").to_csv("saida/hierarquico_grupos.csv")
 print("\nIsolados em cada grupo:")
