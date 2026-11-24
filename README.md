@@ -1,6 +1,6 @@
 # T1 – Aprendizado Não Supervisionado (dados da Regenera)
 
-Integrantes: Estevam Cabral, Luísa Scolari e Marcela Zarichta
+Integrantes: Estevam Cabral (23108553), Luísa Scolari (23102520) e Marcela Zarichta (23106602)
 
 ## Parte 1 – Pré-Processamento
 
