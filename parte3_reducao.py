@@ -22,6 +22,8 @@ tabela = pd.read_csv("saida/dados_tratados.csv", index_col=0)
 X = tabela[[c for c in tabela.columns if c.startswith("Atividade")]]
 particoes = {"Ward": pd.read_csv("saida/hierarquico_grupos.csv", index_col=0)["grupo"].loc[X.index].values,
              "K-Means": pd.read_csv("saida/kmeans_grupos.csv", index_col=0)["grupo"].loc[X.index].values}
+k_parte2 = {nome: len(np.unique(g)) for nome, g in particoes.items()}   # k escolhido na Parte 2 (Ward 7, K-Means 5)
+print("k de cada algoritmo na Parte 2:", k_parte2)
 colunas_gram = tabela[["GRAM_Levedura", "GRAM_Negativo", "GRAM_Positivo"]]
 gram = colunas_gram.idxmax(axis=1).str.replace("GRAM_", "").where(colunas_gram.sum(axis=1) == 1)
 tem_gram = gram.notna().values
@@ -151,20 +153,21 @@ utilidade = pd.Series({nome: cross_val_score(m, Z[tem_gram], gram[tem_gram], cv=
 print(utilidade.round(3).to_string())
 print(f"  (chute pela classe mais comum = {1 / 3:.3f} de acuracia balanceada)")
 
-# E2. Agrupamento no espaco reduzido x no espaco original (mesmos algoritmos e k=7 da Parte 2)
+# E2. Agrupamento no espaco reduzido x no espaco original (mesmos algoritmos e mesmo k da Parte 2)
 #     Silhueta "propria" = medida no espaco onde o agrupamento foi feito;
 #     silhueta "original" = os mesmos grupos medidos nas 23 atividades (comparacao justa entre espacos).
-algoritmos = {"Ward": lambda: AgglomerativeClustering(n_clusters=7, linkage="ward"),
-              "K-Means": lambda: KMeans(n_clusters=7, random_state=SEMENTE, n_init=20)}
+algoritmos = {"Ward": lambda k: AgglomerativeClustering(n_clusters=k, linkage="ward"),
+              "K-Means": lambda k: KMeans(n_clusters=k, random_state=SEMENTE, n_init=20)}
 espacos = {"Original (23)": X.values, f"PCA {d_escolhido}D": pca_d, "PCA 2D": pca2, "t-SNE 2D": tsne2}
 sorteio = np.random.default_rng(SEMENTE)
 amostras = [sorteio.choice(len(X), size=int(0.8 * len(X)), replace=False) for _ in range(20)]
 linhas = []
 for nome_alg, criar in algoritmos.items():
     for nome_esp, Z in espacos.items():
-        grupos = criar().fit_predict(Z) + 1
-        estabilidade = np.mean([adjusted_rand_score(grupos[a], criar().fit_predict(Z[a])) for a in amostras])
-        linhas.append({"algoritmo": nome_alg, "espaco": nome_esp,
+        k = k_parte2[nome_alg]
+        grupos = criar(k).fit_predict(Z) + 1
+        estabilidade = np.mean([adjusted_rand_score(grupos[a], criar(k).fit_predict(Z[a])) for a in amostras])
+        linhas.append({"algoritmo": f"{nome_alg} (k={k})", "espaco": nome_esp,
                        "silhueta_propria": silhouette_score(Z, grupos),
                        "silhueta_original": silhouette_score(X, grupos),
                        "davies_bouldin": davies_bouldin_score(Z, grupos),
@@ -172,18 +175,15 @@ for nome_alg, criar in algoritmos.items():
                        "ARI_vs_original": adjusted_rand_score(particoes[nome_alg], grupos),
                        "estabilidade": estabilidade})
 comparacao = pd.DataFrame(linhas).set_index(["algoritmo", "espaco"])
-print("\nE2. Agrupamento (k=7) no espaco original x reduzido:")
+print("\nE2. Agrupamento (k da Parte 2) no espaco original x reduzido:")
 print(comparacao.round(3).to_string())
 print("  ARI_vs_original = concordancia com os grupos da Parte 2 (1 = mesmos grupos)")
 comparacao.round(4).to_csv("saida/reducao_comparacao_agrupamento.csv")
 
 # E3. Mesmo teste de k = 2 a 10 da Parte 2, agora no espaco PCA reduzido, para comparar com o original
 print(f"\nE3. Silhueta por k: original x PCA {d_escolhido}D x t-SNE 2D:")
-silhuetas = pd.DataFrame({(alg, esp): [silhouette_score(Z, (AgglomerativeClustering(n_clusters=k, linkage="ward")
-                                                            if alg == "Ward" else
-                                                            KMeans(n_clusters=k, random_state=SEMENTE, n_init=20))
-                                                           .fit_predict(Z)) for k in range(2, 11)]
-                          for alg in algoritmos for esp, Z in espacos.items() if esp != "PCA 2D"},
+silhuetas = pd.DataFrame({(alg, esp): [silhouette_score(Z, criar(k).fit_predict(Z)) for k in range(2, 11)]
+                          for alg, criar in algoritmos.items() for esp, Z in espacos.items() if esp != "PCA 2D"},
                          index=pd.Index(range(2, 11), name="k"))
 print(silhuetas.round(3).to_string())
 
@@ -191,6 +191,7 @@ fig, eixos = plt.subplots(1, 2, figsize=(13, 4))
 for ax, alg in zip(eixos, algoritmos):
     for esp in silhuetas[alg].columns:
         ax.plot(silhuetas.index, silhuetas[(alg, esp)], marker="o", label=esp)
+    ax.axvline(k_parte2[alg], ls=":", color="gray")
     ax.set_title(f"{alg} - silhueta média por k")
     ax.set_xlabel("número de grupos (k)")
     ax.legend()
