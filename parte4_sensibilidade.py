@@ -1,5 +1,5 @@
 # PARTE 4 - SENSIBILIDADE AO PRE-PROCESSAMENTO
-# Refaz o pre-processamento das atividades mudando uma decisao por vez e repete o agrupamento (Ward k=7 e K-Means k=5)
+# Refaz o pre-processamento das atividades sem padronizar as binarias (01, 03, 04 e 16) e repete o agrupamento (Ward k=7 e K-Means k=5)
 # e o PCA. Rodar dentro da pasta do projeto, depois das partes 1 e 2: python parte4_sensibilidade.py
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,17 +26,15 @@ limpas = dados[atividades].replace({"Positivo": "1", "Negativo": "0"}).apply(pd.
 limpas = limpas.fillna(limpas.median())
 
 
-def preparar(log=True, padronizar_binarias=True):
+def preparar(padronizar_binarias=True):
     ativ = limpas.copy()
-    if log:
-        ativ[cauda_longa] = np.log1p(ativ[cauda_longa])
+    ativ[cauda_longa] = np.log1p(ativ[cauda_longa])
     colunas = atividades if padronizar_binarias else [c for c in atividades if c not in binarias]
     ativ[colunas] = StandardScaler().fit_transform(ativ[colunas])
     return ativ
 
 
 variantes = {"Base (log + padronização)": preparar(),
-             "Sem log": preparar(log=False),
              "Binárias sem padronizar": preparar(padronizar_binarias=False)}
 
 tabela = pd.read_csv("saida/dados_tratados.csv", index_col=0)

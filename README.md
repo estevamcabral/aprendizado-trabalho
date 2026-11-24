@@ -56,8 +56,7 @@ Rodar depois das partes 1 e 2:
 python parte4_sensibilidade.py
 ```
 
-- Refaz o pré-processamento das 23 atividades mudando uma decisão por vez: sem log nas atividades de cauda longa
-  e atividades binárias (01, 03, 04 e 16) mantidas em 0/1 sem padronizar.
-- Em cada versão repete o Ward (k=7), o K-Means (k=5) e o PCA, e compara com a versão base (silhueta, Davies-Bouldin,
+- Refaz o pré-processamento das 23 atividades mantendo as atividades binárias (01, 03, 04 e 16) em 0/1, sem padronizar.
+- Nas duas versões (base e binárias sem padronizar) repete o Ward (k=7), o K-Means (k=5) e o PCA, e compara com a versão base (silhueta, Davies-Bouldin,
   ARI com o GRAM, estabilidade, ARI com os grupos da base, melhor k pela silhueta e variância do PCA). Semente 42.
 - Saídas em `saida/`: `sensibilidade_resultados.csv` e `sensibilidade_silhueta_por_k.png`.
