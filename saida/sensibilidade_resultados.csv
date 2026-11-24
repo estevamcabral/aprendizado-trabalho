@@ -1,0 +1,7 @@
+algoritmo,versao,silhueta,davies_bouldin,ARI_GRAM,estabilidade,ARI_vs_base,melhor_k_silhueta,tamanhos,PCA_PC1+PC2,PCA_d_80%
+Ward (k=7),Base (log + padronização),0.1288,2.0107,0.1128,0.5977,1.0,7,156/135/89/59/27/21/19,0.2896,14
+K-Means (k=5),Base (log + padronização),0.1419,1.8885,0.117,0.6797,1.0,5,165/164/137/21/19,0.2896,14
+Ward (k=7),Sem log,0.132,2.0263,0.111,0.5574,0.672,7,156/127/85/70/28/21/19,0.2773,14
+K-Means (k=5),Sem log,0.125,2.2376,0.0543,0.6681,0.5814,6,159/142/107/79/19,0.2773,14
+Ward (k=7),Binárias sem padronizar,0.0852,2.4364,0.0538,0.4074,0.3659,2,117/97/87/79/57/56/13,0.335,11
+K-Means (k=5),Binárias sem padronizar,0.1202,2.2472,0.0644,0.8306,0.4244,2,129/118/103/88/68,0.335,11

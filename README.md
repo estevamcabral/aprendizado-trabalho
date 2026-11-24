@@ -48,3 +48,16 @@ python parte3_reducao.py
 - Comparação com o estado inicial (23 atividades): Ward (k=7) e K-Means (k=5), com o mesmo k da Parte 2, refeitos nos espaços PCA 14D, PCA 2D e t-SNE 2D.
 - Saídas em `saida/`: `reducao_pca_variancia_mse.png`, `reducao_projecoes_2d.png`, `reducao_tsne_perplexity.png`,
   `reducao_silhueta_por_k.png`, `reducao_coordenadas.csv` e `reducao_comparacao_agrupamento.csv`.
+
+## Parte 4 – Sensibilidade ao pré-processamento (Etapa 3)
+
+Rodar depois das partes 1 e 2:
+```bash
+python parte4_sensibilidade.py
+```
+
+- Refaz o pré-processamento das 23 atividades mudando uma decisão por vez: sem log nas atividades de cauda longa
+  e atividades binárias (01, 03, 04 e 16) mantidas em 0/1 sem padronizar.
+- Em cada versão repete o Ward (k=7), o K-Means (k=5) e o PCA, e compara com a versão base (silhueta, Davies-Bouldin,
+  ARI com o GRAM, estabilidade, ARI com os grupos da base, melhor k pela silhueta e variância do PCA). Semente 42.
+- Saídas em `saida/`: `sensibilidade_resultados.csv` e `sensibilidade_silhueta_por_k.png`.
